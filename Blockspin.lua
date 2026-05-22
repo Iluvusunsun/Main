@@ -1,213 +1,10 @@
-local Players = game:GetService("Players")
-local TweenService = game:GetService("TweenService")
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local player = Players.LocalPlayer
-local playerGui = player:WaitForChild("PlayerGui")
 
-local Done = false
-local LOGO_ID = "rbxassetid://110538801742199"
-
-local function checkCondition()
-    local splashScreenGui = playerGui:FindFirstChild("SplashScreenGui")
-    if splashScreenGui then
-        local frame = splashScreenGui:FindFirstChild("Frame")
-        if frame then
-            local playButton = frame:FindFirstChild("PlayButton")
-            if playButton and playButton.Visible == true then
-                return true
-            end
-        end
-    end
-    return false
-end
-
-if checkCondition() then
-    local FONT = Enum.Font.GothamMedium
-
-    -- สร้าง ScreenGui
-    local screenGui = Instance.new("ScreenGui")
-    screenGui.Name = "SalmonX_Premium"
-    screenGui.ResetOnSpawn = false
-    screenGui.IgnoreGuiInset = true
-    screenGui.Parent = playerGui
-
-    -- หน้าต่างหลัก (Main Frame)
-    local main = Instance.new("Frame")
-    main.Name = "MainFrame"
-    main.Size = UDim2.new(0, 380, 0, 240)
-    main.Position = UDim2.fromScale(0.5, 0.5)
-    main.AnchorPoint = Vector2.new(0.5, 0.5)
-    main.BackgroundColor3 = Color3.fromRGB(15, 15, 20) -- พื้นหลังมืดแบบในรูป
-    main.BorderSizePixel = 0
-    main.Parent = screenGui
-    
-    local corner = Instance.new("UICorner", main)
-    corner.CornerRadius = UDim.new(0, 25)
-
-    -- เส้นขอบสีส้ม (Stroke)
-    local mainStroke = Instance.new("UIStroke")
-    mainStroke.Thickness = 2.5
-    mainStroke.Color = Color3.fromRGB(255, 100, 0) -- สีส้มสว่าง
-    mainStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-    mainStroke.Parent = main
-
-    -- Logo (ตรงกลางด้านบน)
-    local logo = Instance.new("ImageLabel")
-    logo.Name = "Logo"
-    logo.Size = UDim2.new(0, 65, 0, 65)
-    logo.Position = UDim2.new(0.5, 0, 0, 15)
-    logo.AnchorPoint = Vector2.new(0.5, 0)
-    logo.BackgroundTransparency = 1
-    logo.Image = LOGO_ID
-    logo.Parent = main
-
-    -- Title: SALMON X HUB | Script Premium
-    local title = Instance.new("TextLabel")
-    title.Size = UDim2.new(1, 0, 0, 30)
-    title.Position = UDim2.new(0, 0, 0, 85)
-    title.BackgroundTransparency = 1
-    title.Text = "SALMON X HUB | Script Premium"
-    title.Font = Enum.Font.GothamBold
-    title.TextSize = 20
-    title.TextColor3 = Color3.fromRGB(255, 255, 255)
-    title.Parent = main
-
-    -- Subtitle: Select mode to play
-    local subTitle = Instance.new("TextLabel")
-    subTitle.Size = UDim2.new(1, 0, 0, 20)
-    subTitle.Position = UDim2.new(0, 0, 0, 110)
-    subTitle.BackgroundTransparency = 1
-    subTitle.Text = "Select mode to play"
-    subTitle.Font = FONT
-    subTitle.TextSize = 14
-    subTitle.TextColor3 = Color3.fromRGB(160, 160, 170)
-    subTitle.Parent = main
-
-    -- ฟังก์ชันสร้างปุ่มตามแบบเป๊ะๆ
-    local function createStyledButton(txt, yPos, isFilled)
-        local btn = Instance.new("TextButton")
-        btn.Size = UDim2.new(0, 320, 0, 42)
-        btn.Position = UDim2.new(0.5, 0, 0, yPos)
-        btn.AnchorPoint = Vector2.new(0.5, 0)
-        btn.Font = FONT
-        btn.TextSize = 16
-        btn.AutoButtonColor = true
-        btn.Parent = main
-        
-        Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 12)
-        
-        if isFilled then
-            -- ปุ่ม God Mode (สีส้มทึบ)
-            btn.BackgroundColor3 = Color3.fromRGB(255, 85, 0)
-            btn.TextColor3 = Color3.fromRGB(255, 255, 255)
-            btn.Text = txt
-            btn.BorderSizePixel = 0
-        else
-            -- ปุ่ม Normal Mode (โปร่งแสงมีขอบ)
-            btn.BackgroundColor3 = Color3.fromRGB(30, 30, 35)
-            btn.BackgroundTransparency = 0.5
-            btn.TextColor3 = Color3.fromRGB(200, 200, 200)
-            btn.Text = txt
-            
-            local s = Instance.new("UIStroke")
-            s.Thickness = 1.2
-            s.Color = Color3.fromRGB(255, 100, 0)
-            s.Transparency = 0.4
-            s.Parent = btn
-        end
-
-        return btn
-    end
-
-    local normalBtn = createStyledButton("Normal Mode", 145, false)
-    local godBtn = createStyledButton("God Mode", 195, true)
-
-    -- ฟังก์ชันปิด UI แบบ Smooth
-    local function destroyUI()
-        TweenService:Create(main, TweenInfo.new(0.3, Enum.EasingStyle.Back, Enum.EasingDirection.In), {
-            Size = UDim2.new(0, 0, 0, 0),
-            BackgroundTransparency = 1
-        }):Play()
-        task.wait(0.3)
-        screenGui:Destroy()
-    end
-
-    local function pressButton(guiObject)
-        if not guiObject then return end
-        pcall(function() guiObject:Activate() end)
-        pcall(function() firesignal(guiObject.MouseButton1Click) end)
-    end
-
-    -- Events
-    normalBtn.MouseButton1Click:Connect(function()
-        destroyUI()
-        task.spawn(function()
-            task.wait(1)
-            local splashGui = playerGui:FindFirstChild("SplashScreenGui")
-            if splashGui and splashGui.Enabled then
-                local playButton = splashGui.Frame:FindFirstChild("PlayButton")
-                pressButton(playButton)
-            end
-            Done = true
-        end)
-    end)
-
-    godBtn.MouseButton1Click:Connect(function()
-        destroyUI()
-        task.spawn(function()
-            -- Logic God Mode ของคุณ
-            local Net = require(ReplicatedStorage.Modules.Core.Net)
-            if not _G.Bypass then
-                local func = getupvalue(Net.get, 2)
-                if func then
-                    setconstant(func, 3, "KUYIENGOKUYIENGO")
-                    setconstant(func, 4, "KUYIENGOKUYIENGO")
-                end
-                _G.Bypass = true
-            end
-
-            local old
-            old = hookfunction(Net.send, function(...)
-                local d = {...}
-                if d[1] == "leave_character_creator" or d[1] == "player_created_outfit" then return nil end
-                return old(...)
-            end)
-
-            task.wait(1)
-            local splashGui = playerGui:FindFirstChild("SplashScreenGui")
-            if splashGui and splashGui.Enabled then
-                local playButton = splashGui.Frame:FindFirstChild("PlayButton")
-                pressButton(playButton)
-            end
-
-            task.wait(4)
-            local characterCreator = playerGui:FindFirstChild("CharacterCreator")
-            if characterCreator then
-                local skipButton = characterCreator.MenuFrame:FindFirstChild("AvatarMenuSkipButton")
-                pressButton(skipButton)
-            end
-
-            task.wait(2)
-            pcall(function() replicatesignal(player.Kill) end)
-
-            task.wait(7)
-            Net.send("death_screen_request_respawn")
-            Done = true
-        end)
-    end)
-else
-    Done = true
-end
-
-repeat task.wait() until Done
 
 local WindUI = loadstring(game:HttpGet("https://github.com/Footagesus/WindUI/releases/latest/download/main.lua"))()
 local player = game.Players.LocalPlayer
 
 local Window = WindUI:CreateWindow({
-    Title = "Salmon x HUB | Premium PVP[ BLOCK SPIN] ",
-    Icon = "rbxassetid://110538801742199",
-    Author = "[🔫]-Block Spin | discord.gg/PM9qsuf6xK",
+    Title = "Ranx HUB | Premium PVP[ BLOCK SPIN] ",
     Folder = "HUB",
     Size = UDim2.fromOffset(700, 540),
     Transparent = true,
@@ -279,15 +76,10 @@ local carTab    = Window:Tab({Title = "Car", Icon = "car"})
 local MiscTab   = Window:Tab({Title = "MISC", Icon = "settings"})
 local ServerTab    = Window:Tab({Title = "Server", Icon = "server"})
 
-HomeTab:Section(
-    {
-        Title = "Hi i'm Kirito team"
-    }
-)
 
 HomeTab:Section(
     {
-        Title = "My Name is x2nyx and boss"
+        Title = "My Name is x2nyx solo Developer"
     }
 )
 
@@ -372,7 +164,7 @@ GeneralTab:Toggle({
 
 GeneralTab:Slider({
     Title = "ความไว",
-    Step = 1,
+    Step = 0.5,
     Value = {
         Min = 0,
         Max = 3,
@@ -404,7 +196,7 @@ GeneralTab:Toggle({
 
 GeneralTab:Slider({
     Title = "ความสูง",
-    Step = 1,
+    Step = 0.5,
     Value = {
         Min = 1,
         Max = 5,
@@ -626,54 +418,14 @@ RunService.Heartbeat:Connect(function()
 end)
 
 local Players = game:GetService("Players")
-local RunService = game:GetService("RunService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
-local LocalPlayer = Players.LocalPlayer
-local DroppedItems = workspace:WaitForChild("DroppedItems")
+local Client = Players.LocalPlayer
+local Network = require(ReplicatedStorage.Modules.Core.Net)
 
-local Character
-local HRP
+local DroppedFolder = workspace:FindFirstChild("DroppedItems")
 
-local PICKUP_DISTANCE = 350
-local TOUCH_REPEAT = 25
 local pickupEnabled = false
-
-
-local function bindCharacter(char)
-    Character = char
-    HRP = char:WaitForChild("HumanoidRootPart", 5)
-end
-
-if LocalPlayer.Character then
-    bindCharacter(LocalPlayer.Character)
-end
-LocalPlayer.CharacterAdded:Connect(bindCharacter)
-
-
-local function firetouch(partA, partB)
-    if not firetouchinterest or not partA or not partB then return end
-    for i = 1, TOUCH_REPEAT do
-        firetouchinterest(partA, partB, 0)
-        firetouchinterest(partA, partB, 1)
-    end
-end
-
-
-RunService.RenderStepped:Connect(function()
-    if not pickupEnabled then return end
-    if not HRP or not HRP.Parent then return end
-
-    for _, item in ipairs(DroppedItems:GetChildren()) do
-        local zone = item:FindFirstChild("PickUpZone")
-        if zone and zone:IsA("BasePart") then
-            local dist = (HRP.Position - zone.Position).Magnitude
-            if dist <= PICKUP_DISTANCE then
-                firetouch(zone, HRP)
-            end
-        end
-    end
-end)
-
 
 GeneralTab:Toggle({
     Title = "ดูดของ",
@@ -683,7 +435,29 @@ GeneralTab:Toggle({
     end
 })
 
---// Anti Ragdoll
+task.spawn(function()
+    while task.wait() do
+        if pickupEnabled and DroppedFolder then
+            for _, v in pairs(DroppedFolder:GetChildren()) do
+                if v:IsA("Model") and v:FindFirstChild("PickUpZone") then
+
+                    local char = Client.Character
+                    local hrp = char and char:FindFirstChild("HumanoidRootPart")
+
+                    if hrp and (v:GetPivot().Position - hrp.Position).Magnitude < 15 then
+                        Network.get("pickup_dropped_item", v)
+                    end
+                end
+            end
+        end
+    end
+end)
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local Network = require(ReplicatedStorage.Modules.Core.Net)
+local RagdollModule = require(ReplicatedStorage.Modules.Game.Ragdoll)
+
 local AntiRagdoll = false
 
 GeneralTab:Toggle({
@@ -694,24 +468,19 @@ GeneralTab:Toggle({
     end
 })
 
-RunService.Heartbeat:Connect(function()
-    if AntiRagdoll then
-        local char = Client.Character
-        if char then
-            local hum = char:FindFirstChildOfClass("Humanoid")
+local Get_Ragdolling = RagdollModule.is_ragdolling.get
 
-            if hum then
-                hum:SetStateEnabled(Enum.HumanoidStateType.Ragdoll, false)
-                hum:SetStateEnabled(Enum.HumanoidStateType.FallingDown, false)
+RagdollModule.is_ragdolling.get = function(...)
+    local result = Get_Ragdolling(...)
 
-                if hum:GetState() == Enum.HumanoidStateType.Ragdoll
-                or hum:GetState() == Enum.HumanoidStateType.FallingDown then
-                    hum:ChangeState(Enum.HumanoidStateType.GettingUp)
-                end
-            end
-        end
+    if result == true and AntiRagdoll then
+        RagdollModule.is_ragdolling.set(false)
+        Network.send("end_ragdoll_early")
+        Network.send("clear_ragdoll")
     end
-end)
+
+    return result
+end
 
 GeneralTab:Section(
     {
@@ -2377,33 +2146,34 @@ end)
 speedBox.PlaceholderText = tostring(SPEED)
 
 MiscTab:Button({
-    Title = "ลดแล็ค",
+    Title = "FPS Boost",
     Callback = function()
+
         local Lighting = game:GetService("Lighting")
         local Terrain = workspace:FindFirstChildOfClass("Terrain")
 
-        -- ปิดเอฟเฟกต์ทั้งหมด
-        for _,v in pairs(Lighting:GetChildren()) do
-            if v:IsA("PostEffect") then
-                v.Enabled = false
-            end
-        end
-
+        -- Lighting
         Lighting.GlobalShadows = false
         Lighting.FogEnd = 9e9
-        Lighting.Brightness = 1
+        Lighting.Brightness = 0
+        Lighting.ClockTime = 14
+        Lighting.EnvironmentDiffuseScale = 0
+        Lighting.EnvironmentSpecularScale = 0
+        Lighting.ShadowSoftness = 0
 
-        -- ลด Material ทั้งแมพ
-        for _,v in pairs(workspace:GetDescendants()) do
-            if v:IsA("BasePart") then
-                v.Material = Enum.Material.SmoothPlastic
-                v.Reflectance = 0
-            elseif v:IsA("Decal") or v:IsA("Texture") then
-                v.Transparency = 1
+        -- ลบ Effects
+        for _,v in pairs(Lighting:GetChildren()) do
+            if v:IsA("PostEffect")
+            or v:IsA("BloomEffect")
+            or v:IsA("BlurEffect")
+            or v:IsA("SunRaysEffect")
+            or v:IsA("ColorCorrectionEffect")
+            or v:IsA("DepthOfFieldEffect") then
+                v:Destroy()
             end
         end
 
-        -- Terrain เบา
+        -- Terrain
         if Terrain then
             Terrain.WaterWaveSize = 0
             Terrain.WaterWaveSpeed = 0
@@ -2411,15 +2181,49 @@ MiscTab:Button({
             Terrain.WaterTransparency = 1
         end
 
-        -- แจ้งเตือน
-        Window:Notify({
-            Title = "FPS Boost",
-            Desc = "Boost FPS Success",
-            Time = 3
-        })
+        -- เปลี่ยนทุกอย่างเป็น Low Poly
+        for _,v in pairs(workspace:GetDescendants()) do
+
+            if v:IsA("BasePart") then
+                v.Material = Enum.Material.SmoothPlastic
+                v.Reflectance = 0
+                v.CastShadow = false
+                v.Color = Color3.fromRGB(90,90,90)
+
+                if not v:IsDescendantOf(game.Players.LocalPlayer.Character) then
+                    v.TextureID = ""
+                end
+            end
+
+            if v:IsA("Decal")
+            or v:IsA("Texture") then
+                v:Destroy()
+            end
+
+            if v:IsA("ParticleEmitter")
+            or v:IsA("Trail")
+            or v:IsA("Smoke")
+            or v:IsA("Fire")
+            or v:IsA("Sparkles")
+            or v:IsA("Explosion") then
+                v:Destroy()
+            end
+
+            if v:IsA("MeshPart") then
+                v.TextureID = ""
+                v.Material = Enum.Material.SmoothPlastic
+                v.Color = Color3.fromRGB(90,90,90)
+            end
+        end
+
+        -- FPS Cap
+        if setfpscap then
+            setfpscap(999)
+        end
+
+        print("FPS BOOST ENABLED")
     end
 })
-
 
 local CrateController = require(game:GetService("ReplicatedStorage").Modules.Game.CrateSystem.Crate)
 
