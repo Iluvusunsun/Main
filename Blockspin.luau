@@ -1,4 +1,37 @@
+if not c().ACBYPASS then
+    task.spawn(xpcall,function()
+		repeat task.wait(2)
+			if Players.LocalPlayer.PlayerGui:FindFirstChild('SplashScreenGui') and not Players.LocalPlayer:GetAttribute('InMenuCharacterCreator') and not Players.LocalPlayer.PlayerGui:FindFirstChild('Slideshow'):FindFirstChild('SlideshowHolder').Visible then
+				GuiService.SelectedObject = Players.LocalPlayer.PlayerGui:FindFirstChild('SplashScreenGui').Frame.PlayButton
+				VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.Return, false, game)
+				VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.Return, false, game)
+			elseif not Players.LocalPlayer.PlayerGui:FindFirstChild('SplashScreenGui') and Players.LocalPlayer:GetAttribute('InMenuCharacterCreator') then
+				GuiService.SelectedObject = Players.LocalPlayer.PlayerGui:FindFirstChild('CharacterCreator'):FindFirstChild('MenuFrame').AvatarMenuSkipButton
+				VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.Return, false, game)
+				VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.Return, false, game)
+			elseif Players.LocalPlayer.PlayerGui:FindFirstChild('SplashScreenGui') and not Players.LocalPlayer:GetAttribute('InMenuCharacterCreator') and Players.LocalPlayer.PlayerGui:FindFirstChild('Slideshow'):FindFirstChild('SlideshowHolder').Visible then
+				GuiService.SelectedObject = Players.LocalPlayer.PlayerGui:FindFirstChild('Slideshow'):FindFirstChild('SlideshowHolder'):FindFirstChild('SlideshowCloseButton')
+				VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.Return, false, game)
+				VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.Return, false, game)
+			elseif not Players.LocalPlayer.PlayerGui:FindFirstChild('SplashScreenGui') and not Players.LocalPlayer:GetAttribute('InMenuCharacterCreator') and not Players.LocalPlayer.PlayerGui:FindFirstChild('Slideshow'):FindFirstChild('SlideshowHolder').Visible then
+				local Net = require(ReplicatedStorage.Modules.Core.Net)
 
+				local func = debug.getupvalue(Net.get,2)
+				debug.setconstant(func,3,"___Bypass")
+				debug.setconstant(func,4,"___Bypass")
+
+				warn([[
+					BYPASS SUCCESSFULLY 
+				]])
+
+				identifyexecutor = nil 
+				task.wait()
+				GuiService.SelectedObject = nil
+				c().ACBYPASS = true
+			end
+		until c().ACBYPASS
+    end,warn)
+end
 
 local WindUI = loadstring(game:HttpGet("https://github.com/Footagesus/WindUI/releases/latest/download/main.lua"))()
 local player = game.Players.LocalPlayer
@@ -67,14 +100,14 @@ UserInputService.InputBegan:Connect(function(input, gp)
     end
 end)
 
-local HomeTab = Window:Tab({Title = "Home", Icon = "house"})
-local GeneralTab = Window:Tab({Title = "General", Icon = "menu"})
-local CombatTab = Window:Tab({Title = "Combat", Icon = "sword"})
-local GunmodsTab    = Window:Tab({Title = "Gunmods", Icon = "crosshair"})
-local VisualTab    = Window:Tab({Title = "Visual", Icon = "eye"})
-local carTab    = Window:Tab({Title = "Car", Icon = "car"})
+local HomeTab = Window:Tab({Title = "HOME", Icon = "house"})
+local GeneralTab = Window:Tab({Title = "MAIN", Icon = "menu"})
+local CombatTab = Window:Tab({Title = "COMBAT", Icon = "sword"})
+local GunmodsTab    = Window:Tab({Title = "GUNMODS", Icon = "crosshair"})
+local VisualTab    = Window:Tab({Title = "VISUAL", Icon = "eye"})
+local carTab    = Window:Tab({Title = "CAR", Icon = "car"})
 local MiscTab   = Window:Tab({Title = "MISC", Icon = "settings"})
-local ServerTab    = Window:Tab({Title = "Server", Icon = "server"})
+local ServerTab    = Window:Tab({Title = "SERVER", Icon = "server"})
 
 
 HomeTab:Section(
@@ -128,13 +161,6 @@ task.spawn(
             HandBalance:SetDesc('<b><font color="#00f2ff">$' .. (HandMoney() or 0) .. "</font></b>")
         end
     end
-)
-
-
-GeneralTab:Section(
-    {
-        Title = "Players"
-    }
 )
 
 local Players = game:GetService("Players")
@@ -484,7 +510,7 @@ end
 
 GeneralTab:Section(
     {
-        Title = "Ett"
+        Title = "ETT"
     }
 )
 
@@ -503,7 +529,7 @@ GeneralTab:Toggle({
 
 GeneralTab:Section(
     {
-        Title = "Snap:"
+        Title = "SNAP:"
     }
 )
 local SnapEnabled = false
@@ -616,7 +642,7 @@ CombatTab:Slider({
 	Step = 1,
 	Value = {
 		Min = 50,
-		Max = 500,
+		Max = 1000,
 		Default = FOV
 	},
 	Callback = function(v)
