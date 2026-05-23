@@ -124,7 +124,7 @@ HomeTab:Section(
 
 HomeTab:Section(
     {
-        Title = "Good luck🍀​"
+        Title = "Good luck​"
     }
 )
 
@@ -2139,86 +2139,6 @@ player.CharacterAdded:Connect(function(c)
 end)
 
 speedBox.PlaceholderText = tostring(SPEED)
-
-MiscTab:Button({
-    Title = "FPS Boost",
-    Callback = function()
-
-        local Lighting = game:GetService("Lighting")
-        local Terrain = workspace:FindFirstChildOfClass("Terrain")
-
-        -- Lighting
-        Lighting.GlobalShadows = false
-        Lighting.FogEnd = 9e9
-        Lighting.Brightness = 0
-        Lighting.ClockTime = 14
-        Lighting.EnvironmentDiffuseScale = 0
-        Lighting.EnvironmentSpecularScale = 0
-        Lighting.ShadowSoftness = 0
-
-        -- Effects
-        for _,v in pairs(Lighting:GetChildren()) do
-            if v:IsA("PostEffect")
-            or v:IsA("BloomEffect")
-            or v:IsA("BlurEffect")
-            or v:IsA("SunRaysEffect")
-            or v:IsA("ColorCorrectionEffect")
-            or v:IsA("DepthOfFieldEffect") then
-                v:Destroy()
-            end
-        end
-
-        -- Terrain
-        if Terrain then
-            Terrain.WaterWaveSize = 0
-            Terrain.WaterWaveSpeed = 0
-            Terrain.WaterReflectance = 0
-            Terrain.WaterTransparency = 1
-        end
-
-        -- Low Poly
-        for _,v in pairs(workspace:GetDescendants()) do
-
-            if v:IsA("BasePart") then
-                v.Material = Enum.Material.SmoothPlastic
-                v.Reflectance = 0
-                v.CastShadow = false
-                v.Color = Color3.fromRGB(90,90,90)
-
-                if not v:IsDescendantOf(game.Players.LocalPlayer.Character) then
-                    v.TextureID = ""
-                end
-            end
-
-            if v:IsA("Decal")
-            or v:IsA("Texture") then
-                v:Destroy()
-            end
-
-            if v:IsA("ParticleEmitter")
-            or v:IsA("Trail")
-            or v:IsA("Smoke")
-            or v:IsA("Fire")
-            or v:IsA("Sparkles")
-            or v:IsA("Explosion") then
-                v:Destroy()
-            end
-
-            if v:IsA("MeshPart") then
-                v.TextureID = ""
-                v.Material = Enum.Material.SmoothPlastic
-                v.Color = Color3.fromRGB(90,90,90)
-            end
-        end
-
-        -- FPS Cap
-        if setfpscap then
-            setfpscap(999)
-        end
-
-        print("FPS BOOST ENABLED")
-    end
-})
 
 local CrateController = require(game:GetService("ReplicatedStorage").Modules.Game.CrateSystem.Crate)
 
