@@ -694,51 +694,21 @@ CombatTab:Dropdown({
 	end
 })
 
+-- STRAIGHT TRACER
 local function CreateCurvedTracer(startPos,endPos)
-	local segments = 20
+	local dist = (endPos - startPos).Magnitude
 
-	local randomDir = Vector3.new(
-		math.random(-20,20),
-		math.random(10,25),
-		math.random(-20,20)
-	)
+	local part = Instance.new("Part")
+	part.Size = Vector3.new(0.05,0.05,dist)
+	part.CFrame = CFrame.new(startPos,endPos) * CFrame.new(0,0,-dist/2)
+	part.Anchored = true
+	part.CanCollide = false
+	part.Material = Enum.Material.Neon
+	part.Color = Color3.fromRGB(255,0,0)
+	part.Transparency = 0
+	part.Parent = workspace
 
-	local mid = (startPos + endPos)/2
-
-	local control1 = mid + randomDir
-
-	local control2 = mid + Vector3.new(
-		math.random(-15,15),
-		math.random(-5,20),
-		math.random(-15,15)
-	)
-
-	local lastPos = startPos
-
-	for i = 1,segments do
-		local t = i/segments
-
-		local p =
-			(1-t)^3 * startPos +
-			3*(1-t)^2*t * control1 +
-			3*(1-t)*t^2 * control2 +
-			t^3 * endPos
-
-		local dist = (p - lastPos).Magnitude
-
-		local part = Instance.new("Part")
-		part.Size = Vector3.new(0.12,0.12,dist)
-		part.CFrame = CFrame.new(lastPos,p) * CFrame.new(0,0,-dist/2)
-		part.Anchored = true
-		part.CanCollide = false
-		part.Material = Enum.Material.Neon
-		part.Color = Color3.fromRGB(255,0,0)
-		part.Parent = workspace
-
-		Debris:AddItem(part,0.25)
-
-		lastPos = p
-	end
+	Debris:AddItem(part,0.15)
 end
 
 local function GetDistanceStart(a,b)
