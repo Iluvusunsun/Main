@@ -69,7 +69,7 @@ ToggleBtn.Draggable = true
 ToggleBtn.AutoButtonColor = false
 
 local Corner = Instance.new("UICorner")
-Corner.CornerRadius = UDim.new(0, 10) -- กลมเต็ม
+Corner.CornerRadius = UDim.new(0, 10)
 Corner.Parent = ToggleBtn
 
 ToggleBtn.MouseButton1Click:Connect(function()
@@ -129,14 +129,14 @@ local PlayerGui = Client:WaitForChild("PlayerGui")
 local BankBalance =
     GeneralTab:Button(
     {
-        Title = "เงินในธนาคาร",
+        Title = "Bank balace",
         Desc = "N/A"
     }
 )
 local HandBalance =
     GeneralTab:Button(
     {
-        Title = "เงินในมือ",
+        Title = "Hand Balace",
         Desc = "N/A"
     }
 )
@@ -181,7 +181,7 @@ Player.CharacterAdded:Connect(function(char)
 end)
 
 GeneralTab:Toggle({
-    Title = "วิ่งไว",
+    Title = "Walk speed",
     Value = false,
     Callback = function(v)
         Enabled = v
@@ -189,7 +189,7 @@ GeneralTab:Toggle({
 })
 
 GeneralTab:Slider({
-    Title = "ความไว",
+    Title = "speed multiple",
     Step = 0.5,
     Value = {
         Min = 0,
@@ -213,7 +213,7 @@ local HighJump = false
 local JumpPower = 1
 
 GeneralTab:Toggle({
-    Title = "กระโดดสูง",
+    Title = "Jump Enabled",
     Default = false,
     Callback = function(v)
         HighJump = v
@@ -221,7 +221,7 @@ GeneralTab:Toggle({
 })
 
 GeneralTab:Slider({
-    Title = "ความสูง",
+    Title = "Jump power",
     Step = 0.5,
     Value = {
         Min = 1,
@@ -249,7 +249,7 @@ RunService.Heartbeat:Connect(function()
 end)
 
 GeneralTab:Toggle({
-    Title = "สเตมิน่าไม่จำกัด",
+    Title = "stamina infinite",
     Default = false,
     Callback = function(state)
         if state then
@@ -316,7 +316,7 @@ local Char = require(game.ReplicatedStorage.Modules.Core.Char)
 getgenv().AntiAimAssiant = false
 
 GeneralTab:Toggle({
-    Title = "กันล็อค",
+    Title = "Antiaim",
     Value = false,
     Callback = function(v)
         getgenv().AntiAimAssiant = v
@@ -411,7 +411,7 @@ local function flickerAndMove()
 end
 
 GeneralTab:Toggle({
-    Title = "กันตาย",
+    Title = "Antikill",
     Value = false,
     Callback = function(v)
         enabled = v
@@ -454,7 +454,7 @@ local DroppedFolder = workspace:FindFirstChild("DroppedItems")
 local pickupEnabled = false
 
 GeneralTab:Toggle({
-    Title = "ดูดของ",
+    Title = "Auto pickup item",
     Default = false,
     Callback = function(state)
         pickupEnabled = state
@@ -487,7 +487,7 @@ local RagdollModule = require(ReplicatedStorage.Modules.Game.Ragdoll)
 local AntiRagdoll = false
 
 GeneralTab:Toggle({
-    Title = "กันล้ม",
+    Title = "AntiRagdoll",
     Default = false,
     Callback = function(v)
         AntiRagdoll = v
@@ -518,7 +518,7 @@ local plsraknet = Raknet or raknet
 if not plsraknet then return end
 
 GeneralTab:Toggle({
-    Title = "ล่องหน",
+    Title = "Invisible",
     Default = false,
     Callback = function(state)
         if plsraknet and plsraknet.desync then
@@ -577,7 +577,7 @@ local function StopSnap()
 end
 
 GeneralTab:Toggle({
-    Title = "มุดดิน",
+    Title = "Snap under map",
     Default = false,
     Callback = function(v)
         if v then
@@ -589,7 +589,7 @@ GeneralTab:Toggle({
 })
 
 GeneralTab:Slider({
-    Title = "ความลึก",
+    Title = "snap high",
     Step = 1,
     Value = {
         Min = 5,
@@ -919,7 +919,7 @@ GunmodsTab:Section(
 )
 
 GunmodsTab:Button({
-    Title = "ยืนยันการแต่งปืน(แต่งแล้วต้องกดตรงนี้)",
+    Title = "Confirm",
     Callback = function()
         local tool = Character:FindFirstChildWhichIsA("Tool")
         if not tool then return end
@@ -938,7 +938,7 @@ GunmodsTab:Button({
 
 
 GunmodsTab:Toggle({
-    Title = "Auto Gun(แนะนำให้กดมันจะแต่งปืนให้เอง)",
+    Title = "Auto Gun",
     Default = false,
     Callback = function(v)
         AutomaticGun = v
@@ -947,7 +947,7 @@ GunmodsTab:Toggle({
 
 
 GunmodsTab:Slider({
-    Title = "อัตราการยิง",
+    Title = "Fire​Rate",
     Step = 1,
     Value = {
         Min = 100,
@@ -960,7 +960,7 @@ GunmodsTab:Slider({
 })
 
 GunmodsTab:Slider({
-    Title = "แรงดีด",
+    Title = "Recoil",
     Step = 0.1,
     Value = {
         Min = 0,
@@ -973,7 +973,7 @@ GunmodsTab:Slider({
 })
 
 GunmodsTab:Slider({
-    Title = "ความแม่นยำ",
+    Title = "Accuracy",
     Step = 0.01,
     Value = {
         Min = 0,
@@ -986,7 +986,7 @@ GunmodsTab:Slider({
 })
 
 GunmodsTab:Slider({
-    Title = "ความทนทาน",
+    Title = "Durability",
     Step = 1,
     Value = {
         Min = 100,
@@ -1074,7 +1074,7 @@ Players.PlayerRemoving:Connect(function(plr)
 end)
 
 VisualTab:Toggle({
-    Title = "มองชื่อ",
+    Title = "ESP name",
     Value = false,
     Callback = function(v)
         ESP.Name = v
@@ -1154,7 +1154,7 @@ Players.PlayerRemoving:Connect(function(plr)
 end)
 
 VisualTab:Toggle({
-    Title = "มองคนเป็นกล่อง",
+    Title = "ESP box",
     Value = false,
     Callback = function(v)
         ESP.Box = v
@@ -1254,7 +1254,7 @@ Players.PlayerRemoving:Connect(function(plr)
 end)
 
 VisualTab:Toggle({
-    Title = "มองเลือด",
+    Title = "ESP Health",
     Value = false,
     Callback = function(v)
         ESP.Health = v
@@ -1343,7 +1343,7 @@ Players.PlayerRemoving:Connect(function(plr)
 end)
 
 VisualTab:Toggle({
-    Title = "ระยะ",
+    Title = "distance",
     Value = false,
     Callback = function(v)
         ESP.Distance = v
@@ -1431,7 +1431,7 @@ task.spawn(function()
 end)
 
 VisualTab:Toggle({
-    Title = "เส้นโยง",
+    Title = "ESP trace",
     Value = false,
     Callback = function(v)
         ESP.Trace = v
@@ -1439,7 +1439,7 @@ VisualTab:Toggle({
 })
 
 VisualTab:Toggle({
-	Title = 'มองของ',
+	Title = 'Inventory Viewer',
 	Default = false,
 	Callback = function(Value)
 		_G.InventoryViewerEnabled = Value
@@ -1706,7 +1706,7 @@ carTab:Section(
 )
 
 carTab:Button({
-        Title = "ดึงรถของตัวเองมาหา",
+        Title = "pull a car",
         Desc = "",
         Callback = function()
             local Players = game:GetService("Players")
@@ -1733,15 +1733,8 @@ for _, vehicle in pairs(Vehicles:GetChildren()) do
                 end
             end
         end
-    end
+	end
 end
-            Window:Notify({
-                Title = "Button",
-                Desc = "Action performed successfully.",
-                Time = 3
-            })
-        end
-    })
 
 MiscTab:Section(
     {
@@ -2157,7 +2150,7 @@ MiscTab:Button({
         Lighting.EnvironmentSpecularScale = 0
         Lighting.ShadowSoftness = 0
 
-        -- ลบ Effects
+        -- Effects
         for _,v in pairs(Lighting:GetChildren()) do
             if v:IsA("PostEffect")
             or v:IsA("BloomEffect")
@@ -2177,7 +2170,7 @@ MiscTab:Button({
             Terrain.WaterTransparency = 1
         end
 
-        -- เปลี่ยนทุกอย่างเป็น Low Poly
+        -- Low Poly
         for _,v in pairs(workspace:GetDescendants()) do
 
             if v:IsA("BasePart") then
@@ -2226,7 +2219,7 @@ local CrateController = require(game:GetService("ReplicatedStorage").Modules.Gam
 local EnabledSkip = false
 
 MiscTab:Toggle({
-    Title = "ข้ามสุ่มของ",
+    Title = "Skip animation",
     Default = EnabledSkip,
     Callback = function(v)
         EnabledSkip = v
