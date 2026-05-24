@@ -1544,7 +1544,6 @@ VisualTab:Toggle({
 								if v ~= Client and v.Character and v.Character:FindFirstChild('HumanoidRootPart') then
 									local root = v.Character.HumanoidRootPart
 
-									-- เก็บ items ที่เจอรอบนี้
 									local Items = {}
 									for _, container in pairs({ v:FindFirstChild('Backpack'), v.Character }) do
 										if container then
@@ -1561,35 +1560,30 @@ VisualTab:Toggle({
 										end
 									end
 
-									-- นับจำนวน item เพื่อคำนวณความสูง GUI
 									local itemCount = 0
 									for _ in pairs(Items) do itemCount += 1 end
 
-									-- สร้าง / อัปเดต BillboardGui
 									local gui = root:FindFirstChild('ItemBillboard')
 									if not gui then
 										gui = Instance.new('BillboardGui')
 										gui.Name = 'ItemBillboard'
 										gui.AlwaysOnTop = true
 										gui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-										gui.StudsOffset = Vector3.new(0, 2, 0)
 										gui.LightInfluence = 0
 										gui.Parent = root
 									end
 
-									-- ปรับขนาดตามจำนวน item (แต่ละ item 16px)
-									local lineHeight = 16
+									local lineHeight = 12
 									local guiHeight = math.max(lineHeight, itemCount * lineHeight)
-									gui.Size = UDim2.new(0, 120, 0, guiHeight)
+									gui.Size = UDim2.new(0, 100, 0, guiHeight)
+									gui.StudsOffset = Vector3.new(0, -3, 0)
 
-									-- ล้าง label เก่า
 									for _, child in pairs(gui:GetChildren()) do
 										if child:IsA('TextLabel') then
 											child:Destroy()
 										end
 									end
 
-									-- สร้าง TextLabel 1 บรรทัดต่อ 1 ชิ้น
 									local index = 0
 									for itemName, rarityName in pairs(Items) do
 										local label = Instance.new('TextLabel')
@@ -1599,7 +1593,7 @@ VisualTab:Toggle({
 										label.BackgroundTransparency = 1
 										label.Text = '[' .. itemName .. ']'
 										label.TextColor3 = GetColorFromRarity(rarityName)
-										label.TextSize = 12
+										label.TextSize = 9
 										label.Font = Enum.Font.GothamBold
 										label.TextXAlignment = Enum.TextXAlignment.Center
 										label.TextStrokeTransparency = 0.5
