@@ -68,7 +68,7 @@ ToggleBtn.Position = UDim2.new(0.5, -20, 0, 10)
 
 ToggleBtn.BackgroundColor3 = Color3.fromRGB(30,30,30)
 ToggleBtn.BackgroundTransparency = 0
-ToggleBtn.Image = "rbxassetid://110538801742199"
+ToggleBtn.Image = "rbxassetid://97538237989336"
 
 ToggleBtn.Active = true
 ToggleBtn.Draggable = true
