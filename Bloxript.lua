@@ -1518,6 +1518,7 @@ VisualTab:Toggle({
 		local Players = game:GetService('Players')
 		local ReplicatedStorage = game:GetService('ReplicatedStorage')
 		local Client = Players.LocalPlayer
+
 		local function GetColorFromRarity(rarityName)
 			local colors = {
 				['Common'] = Color3.fromRGB(255, 255, 255),
@@ -1529,123 +1530,92 @@ VisualTab:Toggle({
 			}
 			return colors[rarityName] or Color3.fromRGB(255, 255, 255)
 		end
+
 		if Value then
 			if not _G.ViewerRunning then
 				_G.ViewerRunning = true
 				task.spawn(function()
 					while task.wait(0.2) do
-						if _G.InventoryViewerEnabled then
-                            pcall(function()
-                                for _, v in pairs(Players:GetPlayers()) do
-                                    if v ~= Client and v.Character and v.Character:FindFirstChild('HumanoidRootPart') then
-                                        local root = v.Character.HumanoidRootPart
-                                        local gui = root:FindFirstChild('ItemBillboard')
-                                        if not gui then
-                                            gui = Instance.new('BillboardGui')
-                                            gui.Name = 'ItemBillboard'
-                                            gui.AlwaysOnTop = true
-                                            gui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-                                            gui.Size = UDim2.new(0, 200, 0, 50)
-                                            gui.StudsOffset = Vector3.new(0, -5, 0)
-                                            gui.ExtentsOffset = Vector3.new(0, 1, 0)
-                                            gui.LightInfluence = 1
-                                            gui.Parent = root
-                                            local bg = Instance.new('Frame')
-                                            bg.Name = 'BG'
-                                            bg.BackgroundTransparency = 1
-                                            bg.Size = UDim2.new(1, 0, 1, 0)
-                                            bg.AnchorPoint = Vector2.new(0.5, 0.5)
-                                            bg.Position = UDim2.new(0.5, 0, 0.5, 0)
-                                            bg.Parent = gui
-                                            local layout = Instance.new('UIListLayout')
-                                            layout.FillDirection = Enum.FillDirection.Horizontal
-                                            layout.HorizontalAlignment = Enum.HorizontalAlignment.Center
-                                            layout.VerticalAlignment = Enum.VerticalAlignment.Center
-                                            layout.Padding = UDim.new(0, 5)
-                                            layout.Parent = bg
-                                        end
-                                        local bg = gui:FindFirstChild('BG')
-                                        if not bg then
-                                            local Items = {}
+						if not _G.InventoryViewerEnabled then
+							continue
+						end
+						pcall(function()
+							for _, v in pairs(Players:GetPlayers()) do
+								if v ~= Client and v.Character and v.Character:FindFirstChild('HumanoidRootPart') then
+									local root = v.Character.HumanoidRootPart
 
-                                            
-                                            for _, child in pairs(bg:GetChildren()) do
-                                                if child:IsA('Frame') then
-                                                    child:Destroy()
-                                                end
-                                            end
+									-- เก็บ items ที่เจอรอบนี้
+									local Items = {}
+									for _, container in pairs({ v:FindFirstChild('Backpack'), v.Character }) do
+										if container then
+											for _, tool in pairs(container:GetChildren()) do
+												if tool:IsA('Tool') and not tool:GetAttribute('JobTool') and not tool:GetAttribute('Locked') then
+													local itemFolder = tool:GetAttribute('AmmoType') and ReplicatedStorage.Items.gun or ReplicatedStorage.Items.melee
+													for _, z in pairs(itemFolder:GetChildren()) do
+														if tool:GetAttribute('RarityName') == z:GetAttribute('RarityName') and tool:GetAttribute('RarityPrice') == z:GetAttribute('RarityPrice') then
+															Items[z.Name] = z:GetAttribute('RarityName')
+														end
+													end
+												end
+											end
+										end
+									end
 
-                                            -- loop item ใน backpack + character
-                                            for _, container in pairs({
-                                                v:FindFirstChild('Backpack'),
-                                                v.Character
-                                            }) do
-                                                if container then
-                                                    for _, tool in pairs(container:GetChildren()) do
-                                                        if tool:IsA('Tool') and not tool:GetAttribute('JobTool') and not tool:GetAttribute('Locked') then
-                                                            local itemFolder = tool:GetAttribute('AmmoType') and ReplicatedStorage.Items.gun or ReplicatedStorage.Items.melee
-                                                            for _, z in pairs(itemFolder:GetChildren()) do
-                                                                if tool:GetAttribute('RarityName') == z:GetAttribute('RarityName') and tool:GetAttribute('RarityPrice') == z:GetAttribute('RarityPrice') then
-                                                                    local imageId = z:GetAttribute('ImageId')
-                                                                    if imageId then
-                                                                        Items[z.Name] = true
-                                                                        if not bg:FindFirstChild(z.Name .. '_bg') then
-                                                                            local iconBg = Instance.new('Frame')
-                                                                            iconBg.Name = z.Name .. '_bg'
-                                                                            iconBg.Size = UDim2.new(0, 34, 0, 34)
-                                                                            iconBg.BackgroundColor3 = GetColorFromRarity(z:GetAttribute('RarityName'))
-                                                                            iconBg.BackgroundTransparency = 1
-                                                                            iconBg.BorderSizePixel = 0
-                                                                            iconBg.Parent = bg
-                                                                            local bgImage = Instance.new('ImageLabel')
-                                                                            bgImage.Name = 'Background'
-                                                                            bgImage.Size = UDim2.new(1, 0, 1, 0)
-                                                                            bgImage.BackgroundTransparency = 1
-                                                                            bgImage.Image = 'rbxassetid://137066731814190'
-                                                                            bgImage.ImageColor3 = GetColorFromRarity(z:GetAttribute('RarityName'))
-                                                                            bgImage.ZIndex = 0
-                                                                            bgImage.Parent = iconBg
-                                                                            local corner = Instance.new('UICorner')
-                                                                            corner.CornerRadius = UDim.new(0.15, 0)
-                                                                            corner.Parent = iconBg
-                                                                            local icon = Instance.new('ImageLabel')
-                                                                            icon.Name = z.Name
-                                                                            icon.Image = imageId
-                                                                            icon.BackgroundTransparency = 1
-                                                                            icon.BorderSizePixel = 0
-                                                                            icon.Size = UDim2.new(0.85, 0, 0.85, 0)
-                                                                            icon.Position = UDim2.new(0.075, 0, 0.075, 0)
-                                                                            icon.Parent = iconBg
-                                                                            local corner2 = Instance.new('UICorner')
-                                                                            corner2.CornerRadius = UDim.new(0, 9)
-                                                                            corner2.Parent = icon
-                                                                        end
-                                                                    end
-                                                                end
-                                                            end
-                                                        end
-                                                    end
-                                                end
-                                            end
-                                            gui.Enabled = _G.InventoryViewerEnabled
-                                            for _, child in pairs(bg:GetChildren()) do
-                                                if child:IsA('Frame') then
-                                                    local itemName = child.Name:gsub('_bg$', '')
-                                                    if not Items[itemName] then
-                                                        child:Destroy()
-                                                    end
-                                                end
-                                            end
-                                        end
-                                    end
-                                end
-                            end)
-                        end
+									-- นับจำนวน item เพื่อคำนวณความสูง GUI
+									local itemCount = 0
+									for _ in pairs(Items) do itemCount += 1 end
+
+									-- สร้าง / อัปเดต BillboardGui
+									local gui = root:FindFirstChild('ItemBillboard')
+									if not gui then
+										gui = Instance.new('BillboardGui')
+										gui.Name = 'ItemBillboard'
+										gui.AlwaysOnTop = true
+										gui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+										gui.StudsOffset = Vector3.new(0, 2, 0)
+										gui.LightInfluence = 0
+										gui.Parent = root
+									end
+
+									-- ปรับขนาดตามจำนวน item (แต่ละ item 16px)
+									local lineHeight = 16
+									local guiHeight = math.max(lineHeight, itemCount * lineHeight)
+									gui.Size = UDim2.new(0, 120, 0, guiHeight)
+
+									-- ล้าง label เก่า
+									for _, child in pairs(gui:GetChildren()) do
+										if child:IsA('TextLabel') then
+											child:Destroy()
+										end
+									end
+
+									-- สร้าง TextLabel 1 บรรทัดต่อ 1 ชิ้น
+									local index = 0
+									for itemName, rarityName in pairs(Items) do
+										local label = Instance.new('TextLabel')
+										label.Name = itemName .. '_label'
+										label.Size = UDim2.new(1, 0, 0, lineHeight)
+										label.Position = UDim2.new(0, 0, 0, index * lineHeight)
+										label.BackgroundTransparency = 1
+										label.Text = '[' .. itemName .. ']'
+										label.TextColor3 = GetColorFromRarity(rarityName)
+										label.TextSize = 12
+										label.Font = Enum.Font.GothamBold
+										label.TextXAlignment = Enum.TextXAlignment.Center
+										label.TextStrokeTransparency = 0.5
+										label.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
+										label.Parent = gui
+										index += 1
+									end
+
+									gui.Enabled = _G.InventoryViewerEnabled
+								end
+							end
+						end)
 					end
 				end)
 			end
 		else
-            
 			for _, v in pairs(Players:GetPlayers()) do
 				if v.Character and v.Character:FindFirstChild('HumanoidRootPart') then
 					local gui = v.Character.HumanoidRootPart:FindFirstChild('ItemBillboard')
@@ -1655,7 +1625,7 @@ VisualTab:Toggle({
 				end
 			end
 		end
-	end  
+	end
 })
 
 local Players = game:GetService("Players")
