@@ -8,9 +8,7 @@ local Camera = workspace.CurrentCamera
 local WindUI = loadstring(game:HttpGet("https://github.com/Footagesus/WindUI/releases/latest/download/main.lua"))()
 
 local Window = WindUI:CreateWindow({
-    Title = "Salmon x Hub | Prisonlife [Premium]​",
-    Icon = "rbxassetid://138614699274576",
-    Author = "Made By kirito-Team",
+    Title = "Rain x Hub | Prisonlife",
     Folder = "Mybabeee",
     Size = UDim2.fromOffset(580, 460),
     MinSize = Vector2.new(560, 350),
