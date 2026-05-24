@@ -88,7 +88,7 @@ if not c().ACBYPASS then
 ██║  ██║██║  ██║██║██║ ╚████║    ██║  ██║╚██████╔╝██████╔╝
 ╚═╝  ╚═╝╚═╝  ╚═╝╚═╝╚═╝  ╚═══╝    ╚═╝  ╚═╝ ╚═════╝ ╚═════╝ 
 
-                BY INPOW LUASYNC SERVICE
+                Rain Hub Success
                 ]])
 
                 identifyexecutor = nil
