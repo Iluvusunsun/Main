@@ -1,43 +1,109 @@
-getgenv().ACBYPASS = getgenv().ACBYPASS or false
+if not game:IsLoaded() then game.Loaded:Wait() end
 
-if not getgenv().ACBYPASS then
-    task.spawn(function()
-		repeat task.wait(2)
-			if Players.LocalPlayer.PlayerGui:FindFirstChild('SplashScreenGui') and not Players.LocalPlayer:GetAttribute('InMenuCharacterCreator') and not Players.LocalPlayer.PlayerGui:FindFirstChild('Slideshow'):FindFirstChild('SlideshowHolder').Visible then
-				GuiService.SelectedObject = Players.LocalPlayer.PlayerGui:FindFirstChild('SplashScreenGui').Frame.PlayButton
-				VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.Return, false, game)
-				VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.Return, false, game)
+repeat task.wait() until game.Players.LocalPlayer and game.Players.LocalPlayer.PlayerGui
 
-			elseif not Players.LocalPlayer.PlayerGui:FindFirstChild('SplashScreenGui') and Players.LocalPlayer:GetAttribute('InMenuCharacterCreator') then
-				GuiService.SelectedObject = Players.LocalPlayer.PlayerGui:FindFirstChild('CharacterCreator'):FindFirstChild('MenuFrame').AvatarMenuSkipButton
-				VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.Return, false, game)
-				VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.Return, false, game)
-
-			elseif Players.LocalPlayer.PlayerGui:FindFirstChild('SplashScreenGui') and not Players.LocalPlayer:GetAttribute('InMenuCharacterCreator') and Players.LocalPlayer.PlayerGui:FindFirstChild('Slideshow'):FindFirstChild('SlideshowHolder').Visible then
-				GuiService.SelectedObject = Players.LocalPlayer.PlayerGui:FindFirstChild('Slideshow'):FindFirstChild('SlideshowHolder'):FindFirstChild('SlideshowCloseButton')
-				VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.Return, false, game)
-				VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.Return, false, game)
-
-			elseif not Players.LocalPlayer.PlayerGui:FindFirstChild('SplashScreenGui') and not Players.LocalPlayer:GetAttribute('InMenuCharacterCreator') and not Players.LocalPlayer.PlayerGui:FindFirstChild('Slideshow'):FindFirstChild('SlideshowHolder').Visible then
-				local Net = require(ReplicatedStorage.Modules.Core.Net)
-
-				local func = debug.getupvalue(Net.get,2)
-				debug.setconstant(func,3,"___Bypass")
-				debug.setconstant(func,4,"___Bypass")
-
-				warn([[
-BYPASS SUCCESSFULLY
-				]])
-
-				identifyexecutor = nil
-				task.wait()
-				GuiService.SelectedObject = nil
-				getgenv().ACBYPASS = true
-			end
-
-		until getgenv().ACBYPASS
-    end)
+local function c() 
+    return getgenv() 
 end
+
+local Service = setmetatable({}, {
+    __index = function(self, name) 
+        return game:GetService(name) 
+    end
+})
+
+if c().PIGHUB_LOADED then 
+    return 
+end
+
+c().PIGHUB_LOADED = true
+
+local TweenService = Service.TweenService
+local Players = Service.Players
+local HttpService = Service.HttpService
+local UserInputService = Service.UserInputService
+local ReplicatedStorage = Service.ReplicatedStorage
+local GuiService = Service.GuiService
+local VirtualInputManager = Service.VirtualInputManager
+local Lighting = Service.Lighting
+local RunService = Service.RunService
+local Debris = Service.Debris
+
+if not c().ACBYPASS then
+    task.spawn(xpcall, function()
+
+        repeat 
+            task.wait(2)
+
+            if Players.LocalPlayer.PlayerGui:FindFirstChild("SplashScreenGui") 
+            and not Players.LocalPlayer:GetAttribute("InMenuCharacterCreator") 
+            and not Players.LocalPlayer.PlayerGui:FindFirstChild("Slideshow"):FindFirstChild("SlideshowHolder").Visible then
+
+                GuiService.SelectedObject = Players.LocalPlayer.PlayerGui
+                    :FindFirstChild("SplashScreenGui")
+                    .Frame.PlayButton
+
+                VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.Return, false, game)
+                VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.Return, false, game)
+
+            elseif not Players.LocalPlayer.PlayerGui:FindFirstChild("SplashScreenGui") 
+            and Players.LocalPlayer:GetAttribute("InMenuCharacterCreator") then
+
+                GuiService.SelectedObject = Players.LocalPlayer.PlayerGui
+                    :FindFirstChild("CharacterCreator")
+                    :FindFirstChild("MenuFrame")
+                    .AvatarMenuSkipButton
+
+                VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.Return, false, game)
+                VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.Return, false, game)
+
+            elseif Players.LocalPlayer.PlayerGui:FindFirstChild("SplashScreenGui") 
+            and not Players.LocalPlayer:GetAttribute("InMenuCharacterCreator") 
+            and Players.LocalPlayer.PlayerGui:FindFirstChild("Slideshow"):FindFirstChild("SlideshowHolder").Visible then
+
+                GuiService.SelectedObject = Players.LocalPlayer.PlayerGui
+                    :FindFirstChild("Slideshow")
+                    :FindFirstChild("SlideshowHolder")
+                    :FindFirstChild("SlideshowCloseButton")
+
+                VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.Return, false, game)
+                VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.Return, false, game)
+
+            elseif not Players.LocalPlayer.PlayerGui:FindFirstChild("SplashScreenGui") 
+            and not Players.LocalPlayer:GetAttribute("InMenuCharacterCreator") 
+            and not Players.LocalPlayer.PlayerGui:FindFirstChild("Slideshow"):FindFirstChild("SlideshowHolder").Visible then
+
+                local Net = require(ReplicatedStorage.Modules.Core.Net)
+
+                local func = debug.getupvalue(Net.get, 2)
+
+                debug.setconstant(func, 3, "___Bypass")
+                debug.setconstant(func, 4, "___Bypass")
+
+                warn([[
+██████╗  █████╗ ██╗███╗   ██╗    ██╗  ██╗██╗   ██╗██████╗ 
+██╔══██╗██╔══██╗██║████╗  ██║    ██║  ██║██║   ██║██╔══██╗
+██████╔╝███████║██║██╔██╗ ██║    ███████║██║   ██║██████╔╝
+██╔══██╗██╔══██║██║██║╚██╗██║    ██╔══██║██║   ██║██╔══██╗
+██║  ██║██║  ██║██║██║ ╚████║    ██║  ██║╚██████╔╝██████╔╝
+╚═╝  ╚═╝╚═╝  ╚═╝╚═╝╚═╝  ╚═══╝    ╚═╝  ╚═╝ ╚═════╝ ╚═════╝ 
+
+                BY INPOW LUASYNC SERVICE
+                ]])
+
+                identifyexecutor = nil
+                task.wait()
+
+                GuiService.SelectedObject = nil
+                c().ACBYPASS = true
+            end
+
+        until c().ACBYPASS
+
+    end, warn)
+end
+
+repeat task.wait() until c().ACBYPASS
 
 local WindUI = loadstring(game:HttpGet("https://github.com/Footagesus/WindUI/releases/latest/download/main.lua"))()
 local player = game.Players.LocalPlayer
