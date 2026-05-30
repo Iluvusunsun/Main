@@ -673,9 +673,11 @@ GeneralTab:Slider({
     end
 })
 
+
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local Debris = game:GetService("Debris")
+local Stats = game:GetService("Stats")
 
 local Camera = workspace.CurrentCamera
 local LocalPlayer = Players.LocalPlayer
@@ -687,6 +689,7 @@ local TargetHistory = {}
 local FOV = 150
 local ShowFOV = false
 local AimPart = "Head"
+local BULLET_SPEED = 1000
 
 local fovCircle = Drawing.new("Circle")
 fovCircle.Radius = FOV
@@ -725,13 +728,11 @@ CombatTab:Slider({
 
 local function GetPlayerNames()
 	local t = {}
-
 	for _,plr in pairs(Players:GetPlayers()) do
 		if plr ~= LocalPlayer then
 			table.insert(t,plr.Name)
 		end
 	end
-
 	return t
 end
 
@@ -741,14 +742,11 @@ CombatTab:Dropdown({
 	Multi = true,
 	Default = {},
 	Callback = function(selected)
-
 		for _,plr in pairs(Players:GetPlayers()) do
 			plr:SetAttribute("SilentAimIgnore",false)
 		end
-
 		for _,name in pairs(selected) do
 			local plr = Players:FindFirstChild(name)
-
 			if plr then
 				plr:SetAttribute("SilentAimIgnore",true)
 			end
@@ -766,10 +764,8 @@ CombatTab:Dropdown({
 	end
 })
 
--- STRAIGHT TRACER
 local function CreateCurvedTracer(startPos,endPos)
 	local dist = (endPos - startPos).Magnitude
-
 	local part = Instance.new("Part")
 	part.Size = Vector3.new(0.05,0.05,dist)
 	part.CFrame = CFrame.new(startPos,endPos) * CFrame.new(0,0,-dist/2)
@@ -779,7 +775,6 @@ local function CreateCurvedTracer(startPos,endPos)
 	part.Color = Color3.fromRGB(255,0,0)
 	part.Transparency = 0
 	part.Parent = workspace
-
 	Debris:AddItem(part,0.15)
 end
 
@@ -811,18 +806,14 @@ local function GetClosestTarget()
 	for _,v in pairs(Players:GetPlayers()) do
 		if v ~= LocalPlayer and v.Character and IsAlive(v.Character) then
 			if not v:GetAttribute("SilentAimIgnore") then
-
 				local root = v.Character:FindFirstChild("HumanoidRootPart")
-
 				if root then
 					local pos,onScreen = WorldToViewPoint(root.Position)
-
 					if onScreen then
 						local d = GetDistanceStart(
 							Vector2.new(pos.X,pos.Y),
 							Vector2.new(Camera.ViewportSize.X/2,Camera.ViewportSize.Y/2)
 						)
-
 						if d < FOV and d < dist then
 							closest = v.Character
 							dist = d
@@ -832,7 +823,6 @@ local function GetClosestTarget()
 			end
 		end
 	end
-
 	return closest
 end
 
@@ -841,26 +831,16 @@ RunService.RenderStepped:Connect(function()
 		Camera.ViewportSize.X/2,
 		Camera.ViewportSize.Y/2
 	)
-
 	fovCircle.Radius = FOV
 	fovCircle.Visible = ShowFOV
 
 	local target = GetClosestTarget()
-
 	if target then
-		local part = target:FindFirstChild(
-			AimPart == "Body" and "HumanoidRootPart" or "Head"
-		)
-
+		local part = target:FindFirstChild(AimPart == "Body" and "HumanoidRootPart" or "Head")
 		if part then
 			local pos,onScreen = WorldToViewPoint(part.Position)
-
 			if onScreen then
-				tracer.From = Vector2.new(
-					Camera.ViewportSize.X/2,
-					Camera.ViewportSize.Y/2
-				)
-
+				tracer.From = Vector2.new(Camera.ViewportSize.X/2,Camera.ViewportSize.Y/2)
 				tracer.To = Vector2.new(pos.X,pos.Y)
 				tracer.Visible = true
 			else
@@ -876,19 +856,14 @@ end)
 
 local function GetVelocity(target,pos)
 	local t = tick()
-
 	TargetHistory[target] = TargetHistory[target] or {}
-
 	local hist = TargetHistory[target]
 
 	if #hist >= 3 then
 		table.remove(hist,1)
 	end
 
-	table.insert(hist,{
-		pos = pos,
-		time = t
-	})
+	table.insert(hist,{pos = pos, time = t})
 
 	if #hist < 2 then
 		return Vector3.zero
@@ -896,14 +871,25 @@ local function GetVelocity(target,pos)
 
 	local p1 = hist[#hist - 1]
 	local p2 = hist[#hist]
-
 	local dt = math.max(p2.time - p1.time,0.000001)
+	local vel = (p2.pos - p1.pos) / dt
+	
+	if vel.Magnitude > 250 then
+		return Vector3.zero
+	end
 
-	return (p2.pos - p1.pos) / dt
+	return vel
+end
+
+local function GetPing()
+	local ping = 0.05
+	pcall(function()
+		ping = Stats.Network.ServerStatsItem["Data Ping"]:GetValue() / 1000
+	end)
+	return math.clamp(ping, 0, 0.3)
 end
 
 local OldSend
-
 OldSend = hookfunction(Network.send,function(...)
 	local args = {...}
 
@@ -911,59 +897,34 @@ OldSend = hookfunction(Network.send,function(...)
 		local target = GetClosestTarget()
 
 		if target then
-			local part = target:FindFirstChild(
-				AimPart == "Body" and "HumanoidRootPart" or "Head"
-			)
+			local part = target:FindFirstChild(AimPart == "Body" and "HumanoidRootPart" or "Head")
 
 			if part then
 				local char = LocalPlayer.Character
-				if not char then
-					return OldSend(...)
-				end
+				if not char then return OldSend(...) end
 
 				local root = char:FindFirstChild("HumanoidRootPart")
-
-				if not root then
-					return OldSend(...)
-				end
+				if not root then return OldSend(...) end
 
 				local myPos = root.Position
 				local targetPos = part.Position
 
 				local vel = GetVelocity(target,targetPos)
-				local speed = vel.Magnitude
+				local distance = (targetPos - myPos).Magnitude
+				
+				local timeToTarget = distance / BULLET_SPEED
+				local pingTime = GetPing()
+				local totalPredictionTime = timeToTarget + pingTime
 
-				local predictedPos = targetPos
+				local predictedPos = targetPos + (vel * totalPredictionTime)
 
-				if speed <= 250 then
-					if speed >= 2 then
-						local moveDir = vel.Unit
-						predictedPos = targetPos + (moveDir * (speed * 0.15))
-					end
-				end
-
-				local ignore = {
-					LocalPlayer.Character,
-					target
-				}
-
-				local behind = IsBehindWall(
-					myPos,
-					predictedPos,
-					ignore
-				)
+				local ignore = {LocalPlayer.Character, target}
+				local behind = IsBehindWall(myPos, predictedPos, ignore)
 
 				if behind then
-					args[3] = CFrame.new(
-						math.huge,
-						math.huge,
-						math.huge
-					)
+					args[3] = CFrame.new(math.huge, math.huge, math.huge)
 				else
-					args[3] = CFrame.new(
-						myPos,
-						predictedPos
-					)
+					args[3] = CFrame.new(myPos, predictedPos)
 				end
 
 				for _,v in pairs(args[4] or {}) do
@@ -973,16 +934,14 @@ OldSend = hookfunction(Network.send,function(...)
 					end
 				end
 
-				CreateCurvedTracer(
-					myPos,
-					predictedPos
-				)
+				CreateCurvedTracer(myPos, predictedPos)
 			end
 		end
 	end
 
 	return OldSend(table.unpack(args))
 end)
+
 
 GunmodsTab:Section(
     {
