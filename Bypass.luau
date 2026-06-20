@@ -12,11 +12,11 @@ local Service = setmetatable({}, {
     end
 })
 
-if c().PIGHUB_LOADED then 
+if c().ACBYPASS_LOADED then 
     return 
 end
 
-c().PIGHUB_LOADED = true
+c().ACBYPASS_LOADED = true
 
 local TweenService = Service.TweenService
 local Players = Service.Players
@@ -109,7 +109,7 @@ local WindUI = loadstring(game:HttpGet("https://github.com/Footagesus/WindUI/rel
 local player = game.Players.LocalPlayer
 
 local Window = WindUI:CreateWindow({
-    Title = "Ranx HUB | Premium PVP[ BLOCK SPIN] ",
+    Title = "RAINX HUB | Premium PVP[ BLOCK SPIN] ",
     Folder = "HUB",
     Size = UDim2.fromOffset(700, 540),
     Transparent = true,
@@ -379,48 +379,181 @@ GeneralTab:Toggle({
     end
 })
 
-local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
+local Players = game:GetService("Players")
+local UserInputService = game:GetService("UserInputService")
+local LocalPlayer = Players.LocalPlayer
+local Camera = workspace.CurrentCamera
 
-local Client = Players.LocalPlayer
-local Char = require(game.ReplicatedStorage.Modules.Core.Char)
+local BobEnabled = false
+local CycleSpeed = 0.02
+local SideOffset = 5
+local DropDepth = 3
+local VelocityStrength = 999999
 
-getgenv().AntiAimAssiant = false
+local Pattern = {
+    Vector3.new(-SideOffset, SideOffset, 0),
+    Vector3.new(0, 0, 0),
+    Vector3.new(SideOffset, SideOffset, 0),
+    Vector3.new(0, -DropDepth, 0),
+}
+
+local CamAnchor = Instance.new("Part")
+CamAnchor.Name = "CamAnchor"
+CamAnchor.Size = Vector3.new(1, 1, 1)
+CamAnchor.Transparency = 1
+CamAnchor.CanCollide = false
+CamAnchor.Anchored = true
+CamAnchor.Parent = workspace
+
+RunService.Heartbeat:Connect(function()
+    local char = LocalPlayer.Character
+    local hrp = char and char:FindFirstChild("HumanoidRootPart")
+    if not hrp then return end
+
+    if not BobEnabled then
+        CamAnchor.CFrame = hrp.CFrame
+        return
+    end
+
+    local realCFrame = hrp.CFrame
+    local oldVel = hrp.AssemblyLinearVelocity
+    local oldAngVel = hrp.AssemblyAngularVelocity
+
+    CamAnchor.CFrame = realCFrame
+
+    local index = math.floor(tick() / CycleSpeed) % #Pattern + 1
+    local offset = Pattern[index]
+
+    local randRot = CFrame.Angles(
+        math.random(0, 628) / 100,
+        math.random(0, 628) / 100,
+        math.random(0, 628) / 100
+    )
+
+    hrp.CFrame = CFrame.new(realCFrame.Position + offset) * randRot
+
+    hrp.AssemblyLinearVelocity = Vector3.new(
+        math.random(-VelocityStrength, VelocityStrength),
+        math.random(-VelocityStrength, VelocityStrength),
+        math.random(-VelocityStrength, VelocityStrength)
+    )
+    hrp.AssemblyAngularVelocity = Vector3.new(
+        math.random(-VelocityStrength, VelocityStrength),
+        math.random(-VelocityStrength, VelocityStrength),
+        math.random(-VelocityStrength, VelocityStrength)
+    )
+
+    RunService.RenderStepped:Wait()
+
+    hrp.CFrame = realCFrame
+    hrp.AssemblyLinearVelocity = oldVel
+    hrp.AssemblyAngularVelocity = oldAngVel
+end)
+
+local camDistance = 12
+local minZoom, maxZoom = 4, 40
+local yaw, pitch = 0, -0.3
+local heightOffset = 3
+local dragging = false
+
+local activeTouches = {}
+
+UserInputService.InputBegan:Connect(function(input, gp)
+    if input.UserInputType == Enum.UserInputType.Touch then
+        local screenWidth = Camera.ViewportSize.X
+        local isLeftSide = input.Position.X < screenWidth * 0.5
+
+        activeTouches[input] = {
+            isLeftSide = isLeftSide,
+            startPos = input.Position
+        }
+    end
+
+    if not gp and input.UserInputType == Enum.UserInputType.MouseButton2 then
+        dragging = true
+    end
+end)
+
+UserInputService.InputChanged:Connect(function(input, gp)
+    if input.UserInputType == Enum.UserInputType.Touch then
+        local touchData = activeTouches[input]
+        if not touchData then return end
+        if touchData.isLeftSide then return end
+
+        local delta = input.Delta
+        yaw = yaw - delta.X * 0.013
+        pitch = math.clamp(pitch - delta.Y * 0.013, -1.2, 1.2)
+    end
+
+    if gp then return end
+
+    if input.UserInputType == Enum.UserInputType.MouseMovement and dragging then
+        yaw = yaw - input.Delta.X * 0.003
+        pitch = math.clamp(pitch - input.Delta.Y * 0.003, -1.2, 1.2)
+    end
+
+    if input.UserInputType == Enum.UserInputType.MouseWheel then
+        camDistance = math.clamp(camDistance - input.Position.Z * 2, minZoom, maxZoom)
+    end
+end)
+
+UserInputService.InputEnded:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.Touch then
+        activeTouches[input] = nil
+    end
+    if input.UserInputType == Enum.UserInputType.MouseButton2 then
+        dragging = false
+    end
+end)
+
+UserInputService.TouchPinch:Connect(function(touchPositions, scale, velocity, state)
+    if state ~= Enum.UserInputState.Change then return end
+
+    local screenWidth = Camera.ViewportSize.X
+    local allOnRight = true
+
+    for _, pos in pairs(touchPositions) do
+        if pos.X < screenWidth * 0.5 then
+            allOnRight = false
+            break
+        end
+    end
+
+    if allOnRight then
+        camDistance = math.clamp(camDistance / scale, minZoom, maxZoom)
+    end
+end)
+
+RunService.RenderStepped:Connect(function()
+    if not BobEnabled then return end
+
+    Camera.CameraType = Enum.CameraType.Scriptable
+
+    local anchorPos = CamAnchor.Position + Vector3.new(0, heightOffset, 0)
+
+    local camCFrame = CFrame.new(anchorPos)
+        * CFrame.Angles(0, yaw, 0)
+        * CFrame.Angles(pitch, 0, 0)
+        * CFrame.new(0, 0, camDistance)
+
+    Camera.CFrame = CFrame.new(camCFrame.Position, anchorPos)
+end)
 
 GeneralTab:Toggle({
     Title = "Antiaim",
     Value = false,
     Callback = function(v)
         getgenv().AntiAimAssiant = v
+        BobEnabled = v
+
+        if not v then
+            Camera.CameraType = Enum.CameraType.Custom
+        end
+
         print("Anti Aim Status:", v)
     end
 })
-
-RunService.Heartbeat:Connect(function()
-    if getgenv().AntiAimAssiant then
-        local HumanoidModule = Char.get_hum()
-        if HumanoidModule and not HumanoidModule:GetAttribute("HasBeenDowned") then
-            local RootPartModule = Char.get_hrp()
-            if not RootPartModule then return end
-            local oldVelocity = RootPartModule.Velocity
-            local oldLinear = RootPartModule.AssemblyLinearVelocity
-            local oldAngular = RootPartModule.AssemblyAngularVelocity
-            local randomVec = Vector3.new(
-                math.random(-99999999, 99999999),
-                math.random(-99999999, 99999999),
-                math.random(-99999999, 99999999)
-            )
-
-            RootPartModule.Velocity = randomVec
-            RootPartModule.AssemblyLinearVelocity = randomVec
-            RootPartModule.AssemblyAngularVelocity = randomVec
-            RunService.RenderStepped:Wait()
-            RootPartModule.Velocity = oldVelocity
-            RootPartModule.AssemblyLinearVelocity = oldLinear
-            RootPartModule.AssemblyAngularVelocity = oldAngular
-        end
-    end
-end)
 
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
